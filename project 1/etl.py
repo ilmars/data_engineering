@@ -7,6 +7,14 @@ import numpy as np
 
 
 def process_song_file(cur, filepath):
+    '''
+    proceeds files from data/song_data (filepath) and saves them 
+    to database tables "songs" and "artists"
+
+            Parameters:
+                    cur (obj): database connection currsor
+                    filepath (text): file path
+    '''
     # open song file
     df = pd.read_json(filepath, lines=True)
 
@@ -18,7 +26,7 @@ def process_song_file(cur, filepath):
     file_object.write('\n')
     file_object.write(df['title'][0])
     file_object.close()
-
+    print(song_data.values.tolist()[0])
     cur.execute(song_table_insert, song_data.values.tolist()[0])
 
     # insert artist record
@@ -30,6 +38,14 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
+    '''
+    proceeds files from data/log_data (filepath) and saves them 
+    to database tables "times", "users" and "songplay"
+
+            Parameters:
+                    cur (obj): database connection currsor
+                    filepath (text): file path
+    '''
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -58,11 +74,11 @@ def process_log_file(cur, filepath):
 
     # insert songplay records
     for index, row in df.iterrows():
-        file_object = open('log_data.txt', 'a', encoding="utf-8")
-        # Append new line and song title at the end of file
-        file_object.write('\n')
-        file_object.write(row.song)
-        file_object.close()
+        # file_object = open('log_data.txt', 'a', encoding="utf-8")
+        # # Append new line and song title at the end of file
+        # file_object.write('\n')
+        # file_object.write(row.song)
+        # file_object.close()
 
         # get songid and artistid from song and artist tables
         cur.execute(song_select, (row.song, row.artist, row.length))
@@ -80,6 +96,17 @@ def process_log_file(cur, filepath):
 
 
 def process_data(cur, conn, filepath, func):
+    '''
+    Cravls throu data files directories and send each 
+    file to corresponding function.
+
+            Parameters:
+                    cur (obj): database connection currsor
+                    conn (obj): database connection object
+                    filepath (text): log files directory path
+                    function (text): file proceeding function name
+
+    '''
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
@@ -103,7 +130,7 @@ def check_data():
     df = pd.read_csv('log_data.txt', sep=";", header=None)
     df.columns = ["title"]
 
-    # Keep only unique sonng names and add column with false flag 
+    # Keep only unique sonng names and add column with false flag
     # for verification if song exist in song_data
     dfGrouped = df.groupby(['title']).size().to_frame('size')
     dfGrouped.sort_values('size', ascending=False)
@@ -135,7 +162,7 @@ def main():
 
     conn.close()
 
-    check_data()
+    # check_data()
 
 
 if __name__ == "__main__":

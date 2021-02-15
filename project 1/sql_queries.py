@@ -1,9 +1,9 @@
 # DROP TABLES
 
-songplay_table_drop = "DROP TABLE IF EXISTS songplays"
-user_table_drop = "DROP TABLE IF EXISTS users"
-song_table_drop = "DROP TABLE IF EXISTS songs"
-artist_table_drop = "DROP TABLE IF EXISTS artists"
+songplay_table_drop = "DROP TABLE IF EXISTS songplays CASCADE "
+user_table_drop = "DROP TABLE IF EXISTS users CASCADE"
+song_table_drop = "DROP TABLE IF EXISTS songs CASCADE"
+artist_table_drop = "DROP TABLE IF EXISTS artists CASCADE"
 time_table_drop = "DROP TABLE IF EXISTS time"
 
 # CREATE TABLES
@@ -12,13 +12,19 @@ songplay_table_create = ("""
     CREATE SEQUENCE IF NOT EXISTS songplay_id_seq;
     ALTER SEQUENCE songplay_id_seq RESTART WITH 1;
     CREATE TABLE IF NOT EXISTS songplays (
-        songplay_id int NOT NULL DEFAULT nextval('songplay_id_seq'), 
-        start_time bigint, 
-        user_id int, 
+        songplay_id int DEFAULT nextval('songplay_id_seq'), 
+        start_time bigint NOT NULL, 
+        user_id int NOT NULL
+            constraint users_fk
+                references users, 
         level text, 
-        song_id text, 
-        artist_id text, 
-        session_id text, 
+        song_id text NULL
+            constraint songs_fk
+                references songs, 
+        artist_id text NULL 
+            constraint artists_fk
+                references artists,
+        session_id text NOT NULL,  
         location text, 
         user_agent text,
         PRIMARY KEY (songplay_id)
@@ -27,41 +33,38 @@ songplay_table_create = ("""
 
 user_table_create = ("""
     CREATE TABLE IF NOT EXISTS users (
-        user_id int NOT NULL, 
+        user_id int PRIMARY KEY, 
         first_name text, 
         last_name text, 
         gender text,  
-        level text,
-        PRIMARY KEY (user_id)
+        level text
         );
 """)
 
 song_table_create = ("""
     CREATE TABLE IF NOT EXISTS songs (
-        song_id text NOT NULL, 
+        song_id text PRIMARY KEY, 
         title text, 
-        artist_id text, 
+        artist_id text NOT NULL, 
         year int, 
-        duration int,
-        PRIMARY KEY (song_id)
+        duration float
         );
 """)
 
 artist_table_create = ("""
     CREATE TABLE IF NOT EXISTS artists (
-        artist_id text NOT NULL, 
+        artist_id text PRIMARY KEY, 
         name text, 
         location text, 
         latitude float8, 
-        longitude float8 ,
-        PRIMARY KEY (artist_id)
+        longitude float8
         );
 """)
 
 time_table_create = ("""
     CREATE SEQUENCE time_id_seq;
     CREATE TABLE IF NOT EXISTS time (
-        time_id int NOT NULL PRIMARY KEY DEFAULT nextval('time_id_seq'),
+        time_id int PRIMARY KEY DEFAULT nextval('time_id_seq'),
         start_time bigint, 
         hour int, 
         day int, 
@@ -121,5 +124,5 @@ song_select = ("""
 #row.song, row.artist, row.length
 # QUERY LISTS
 
-create_table_queries = [songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
+create_table_queries = [user_table_create, song_table_create, artist_table_create, time_table_create, songplay_table_create]
 drop_table_queries = [songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]

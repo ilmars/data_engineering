@@ -20,6 +20,66 @@ Optimized for queries on song play analysis.
 
 *Remark* Table `songplays` is not direcly linkable to `time`, because value `start_time` is not unique, but stil using this table is efective to group data by different time values.
 
+## File structure
+```
+project 1
+│   README.md
+│   create_tables.py
+│   etl.ipynb
+│   etl.py
+│   sql_queries.py
+│   test.ipynb
+│
+└───data
+│   │
+│   └───log_data
+│       │
+│       └───2018
+│           └───11
+│               │   2018-11-01-events.json
+│               │   ...
+│   └───song_data
+│       │
+│       └───A
+│           └───A
+│               └───A
+│               │   TRAAAAW128F429D538.json
+│               │   ...
+│           │   ...
+│       │   ...
+```
+
+- __README.md__ - project description 
+- __create_tables.py__ - python script for database table creation
+- __etl.ipynb__ - etl script testing file
+- __etl.py__ - extract, transform, load - python script for data exctraction and loading to database
+- __sql_queries.py__ - list of all used SQL queries in this project
+- __test.ipynb__ - SQL test script
+
+## Running scripts
+Scripts can be ran from terminal.
+1.	First step is data base creation:
+
+If you run it from your computer
+```
+python create_tables.py
+```
+, but if you are running it from Udacity test bed
+```
+!python create_tables.py
+```
+2.	Running data pipeline:
+```
+python etl.py
+```
+or 
+```
+!python etl.py
+```
+
+
+
+
 ## Conclusions 
 Given data is only part of biger dataset, fully functional song analyse is not posible, because we can’t join “song_data” and “log_data”, because there can be linked only two songs.
 
@@ -42,7 +102,7 @@ order by t.hour;
 ```sql
 select s.title, count(sp.song_id) from songplays as sp
 join songs s on s.song_id = sp.song_id
-group by sp.song_id
+group by sp.song_id. s.title
 limit 10
 ```
 
